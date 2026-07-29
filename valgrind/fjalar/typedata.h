@@ -603,5 +603,4 @@ unsigned long findFunctionStartPCForVariableEntry(dwarf_entry* e);
 namespace_type* findNamespaceForVariableEntry(dwarf_entry* e);
 dwarf_entry* find_struct_entry_with_name(char* name);
 char* fjalar_demangle(dwarf_entry* cur_entry, const char* mangled_name);
-int is_valid_function(dwarf_entry *entry);
 #endif
