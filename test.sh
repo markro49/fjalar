@@ -15,7 +15,9 @@ set -e
 # Get some system info for debugging.
 gcc --version
 make --version
-lsb_release -a
+if command -v lsb_release &> /dev/null ; then
+  lsb_release -a
+fi
 cat /etc/*release
 ldd --version
 cat /proc/version
@@ -24,23 +26,24 @@ find /lib64/ | grep -s "libc-" || true
 echo "end of system info"
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  JAVA_HOME=${JAVA_HOME:-$(/usr/libexec/java_home)}
+  JAVA_HOME="${JAVA_HOME:-$(/usr/libexec/java_home)}"
 else
-  JAVA_HOME=${JAVA_HOME:-`dirname $(dirname $(readlink -f $(which javac)))`}
+  JAVA_HOME="${JAVA_HOME:-$(dirname "$(dirname "$(readlink -f "$(which javac)")")")}"
 fi
 export JAVA_HOME
 
 # TODO: The tests ought to work even if $DAIKONDIR is not set.
-export DAIKONDIR="${DAIKONDIR:-`pwd`/../daikon}"
+export DAIKONDIR="${DAIKONDIR:-$(pwd)/../daikon}"
 echo "DAIKONDIR=$DAIKONDIR"
 
-if [ -d "/tmp/plume-scripts" ] ; then
-  (cd /tmp/plume-scripts && git -C pull -q) > /dev/null 2>&1
+
+if [ -d "/tmp/git-scripts" ] ; then
+  (cd /tmp/git-scripts && git -C pull -q) > /dev/null 2>&1
 else
-  (cd /tmp && git clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git)
+  (cd /tmp && git clone --depth 1 -q https://github.com/plume-lib/git-scripts.git)
 fi
-/tmp/plume-scripts/git-clone-related codespecs daikon
-ln -s `pwd` ${DAIKONDIR}/fjalar || true
+/tmp/git-scripts/git-clone-related codespecs daikon
+ln -s "$(pwd)" "${DAIKONDIR}/fjalar" || true
 
 make build
 

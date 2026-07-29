@@ -2,7 +2,7 @@
    This file is part of Fjalar, a dynamic analysis framework for C/C++
    programs.
 
-   Copyright (C) 2007-2022 University of Washington Computer Science & Engineering Department,
+   Copyright (C) 2007-2026 University of Washington Computer Science & Engineering Department,
    Programming Languages and Software Engineering Group
 
    Copyright (C) 2004-2006 Philip Guo (pgbovine@alum.mit.edu),
@@ -606,6 +606,13 @@ static int __dtostr(double d,char *buf,int maxlen,
    * wir einen Dezimalpunkt aus und geben prec2 Nachkommastellen aus.
    * Wenn prec2 Null ist, geben wir so viel Stellen aus, wie von prec
    * noch übrig ist. */
+  /* google translate:
+   * We iterate from the left until we reach 0 or maxlen is reached.
+   * If maxlen is reached, we repeat the process using
+   * scientific notation. If there is still some precision (prec) remaining
+   * at that point, we output a decimal point and print prec2 digits
+   * after the decimal point. If prec2 is zero, we print as many digits
+   * as remain from prec. */
   if (d==0.0) {
     prec2=prec2==0?1:prec2+2;
     prec2=prec2>maxlen?8:prec2;

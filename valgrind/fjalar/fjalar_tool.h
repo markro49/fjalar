@@ -2,7 +2,7 @@
    This file is part of Fjalar, a dynamic analysis framework for
    C and C++ programs.
 
-   Copyright (C) 2007-2022 University of Washington Computer Science & Engineering Department,
+   Copyright (C) 2007-2026 University of Washington Computer Science & Engineering Department,
    Programming Languages and Software Engineering Group
 
    Copyright (C) 2004-2006 Philip Guo <pgbovine (@) alum (.) mit (.) edu>,
@@ -44,7 +44,7 @@ void fjalar_tool_print_usage(void);
 // Returns True if a command-line option has been successfully
 // matched, False otherwise.  It's very important that you return
 // False if a command-line option doesn't match because otherwise
-// Fjalar will fail silently when a command-line option is mis-typed.
+// Fjalar will fail silently when a command-line option is mistyped.
 //
 // The format for a command-line option is as follows, as shown by an
 // example implementation of this function:
@@ -87,7 +87,7 @@ Bool fjalar_tool_process_cmd_line_option(const HChar* arg);
 /* Like VG_BOOL_CLO, but of the form "--foo", "--no-foo" rather than
    "--foo=yes", "--foo=no". Note that qq_option should not have a
    leading "--". */
-#define VG_YESNO_CLO(qq_arg, qq_option, qq_var)	\
+#define VG_YESNO_CLO(qq_arg, qq_option, qq_var) \
   (VG_XACT_CLO(qq_arg, "--"qq_option, qq_var, True) || \
    VG_XACT_CLO(qq_arg, "--no-"qq_option, qq_var, False))
 

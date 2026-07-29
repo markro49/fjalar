@@ -2,7 +2,7 @@
    This file is part of Fjalar, a dynamic analysis framework for C/C++
    programs.
 
-   Copyright (C) 2007-2022 University of Washington Computer Science & Engineering Department,
+   Copyright (C) 2007-2026 University of Washington Computer Science & Engineering Department,
    Programming Languages and Software Engineering Group
 
    Copyright (C) 2004-2006 Philip Guo (pgbovine@alum.mit.edu),
@@ -28,8 +28,8 @@ variables.
 #include "fjalar_include.h"
 
 const char COMMENT_CHAR;
-const char* ENTRY_DELIMETER;
-const int ENTRY_DELIMETER_LEN;
+const char* ENTRY_DELIMITER;
+const int ENTRY_DELIMITER_LEN;
 const char* GLOBAL_STRING;
 const int GLOBAL_STRING_LEN;
 const char* MANGLED_TOKEN;

@@ -1,31 +1,34 @@
 jobs:
 
-- job: ubuntu
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/daikon-ubuntu-jdk8-plus:latest
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./test.sh
-    displayName: test.sh
+  # The JDK version doesn't matter, but these Docker images happen to use
+  # different underlying OS versions.
 
-- job: fedora
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/daikon-fedora-jdk8-plus:latest
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./test.sh
-    displayName: test.sh
+  - job: ubuntu_stable
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mdernst/daikon-ubuntu-jdk11-plus:latest
+    steps:
+      - checkout: self
+        fetchDepth: 25
+      - bash: ./test.sh
+        displayName: test.sh
 
-- job: centos
-  pool:
-    vmImage: 'ubuntu-latest'
-  container: mdernst/daikon-centos-jdk8-plus:latest
-  steps:
-  - checkout: self
-    fetchDepth: 25
-  - bash: ./test.sh
-    displayName: test.sh
+  - job: ubuntu_rolling
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mdernst/daikon-ubuntu-jdk24-plus:latest
+    steps:
+      - checkout: self
+        fetchDepth: 25
+      - bash: ./test.sh
+        displayName: test.sh
+
+  - job: rocky
+    pool:
+      vmImage: 'ubuntu-latest'
+    container: mdernst/daikon-rockylinux-jdk11-plus:latest
+    steps:
+      - checkout: self
+        fetchDepth: 25
+      - bash: ./test.sh
+        displayName: test.sh

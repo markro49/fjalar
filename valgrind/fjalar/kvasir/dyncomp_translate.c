@@ -10,7 +10,7 @@
   for C/C++ based upon the Valgrind binary instrumentation framework
   and the Valgrind MemCheck tool.
 
-  Copyright (C) 2007-2022 University of Washington Computer Science & Engineering Department,
+  Copyright (C) 2007-2026 University of Washington Computer Science & Engineering Department,
   Programming Languages and Software Engineering Group
 
   Copyright (C) 2004-2006 Philip Guo (pgbovine@alum.mit.edu),
@@ -246,7 +246,7 @@ IRExpr* shadow_GETI_DC ( DCEnv* dce, IRRegArray* descr, IRAtom* ix, Int bias )
 // comparisons are translated into clean C calls.  The correct
 // behavior is to merge the tags of all arguments but return a new tag
 // of 0 so that the tags do not propagate to the results.  Without
-// further testing on what other opeations are translated into IR as
+// further testing on what other operations are translated into IR as
 // clean C calls, I will simply return a tag of 0 for now.
 static
 IRAtom* handleCCall_DC ( DCEnv* dce,
@@ -1255,8 +1255,10 @@ IRAtom* expr2tags_Binop_DC ( DCEnv* dce,
    case Iop_ShrN16x4:
    case Iop_ShrN32x2:
 
-   case Iop_Perm8x8:                     // only used by arm
+   case Iop_Perm8x8:
    case Iop_PermOrZero8x8:
+   case Iop_Perm8x16:
+   case Iop_PermOrZero8x16:
 
       /* ------------------ 256-bit SIMD Integer. ------------------ */
    case Iop_SarN16x16:
@@ -1506,8 +1508,6 @@ IRAtom* expr2tags_Binop_DC ( DCEnv* dce,
    case Iop_PackOddLanes16x8:            // only used by mips
    case Iop_PackOddLanes32x4:            // only used by mips
    case Iop_PackOddLanes8x16:            // only used by mips
-   case Iop_Perm8x16:                    // only used by ppc arm64
-   case Iop_PermOrZero8x16:
    case Iop_PolynomialMulAdd16x8:        // only used by ppc
    case Iop_PolynomialMulAdd32x4:        // only used by ppc
    case Iop_PolynomialMulAdd64x2:        // only used by ppc
@@ -1904,10 +1904,14 @@ IRExpr* expr2tags_Unop_DC ( DCEnv* dce, IRAtom* atom )
    // Iop_RoundF32x4_RN:               // only used by ppc
    // Iop_RoundF32x4_RP:               // only used by ppc
    // Iop_RoundF32x4_RZ:               // only used by ppc
+   // Iop_RoundF32toIntA0:
+   // Iop_RoundF32toIntE:
    // Iop_RoundF64toF64_NEAREST:       // unused
    // Iop_RoundF64toF64_NegINF:        // unused
    // Iop_RoundF64toF64_PosINF:        // unused
    // Iop_RoundF64toF64_ZERO:          // unused
+   // Iop_RoundF64toIntA0:
+   // Iop_RoundF64toIntE:
    // Iop_RSqrtEst32F0x4:              //
    // Iop_RSqrtEst32Fx2:               // only used by arm
    // Iop_RSqrtEst32Fx4:               //
@@ -2145,7 +2149,9 @@ IRAtom* expr2tags_LDle_DC ( DCEnv* dce, IRType ty, IRAtom* addr, UInt bias )
       case Ity_I32:
       case Ity_I64:
          return expr2tags_LDle_WRK_DC(dce, ty, addr, bias);
+      case Ity_I128:
       case Ity_V128:
+      case Ity_V256:  // not right, should do 4 times?
          v64lo = expr2tags_LDle_WRK_DC(dce, Ity_I64, addr, bias);
          v64hi = expr2tags_LDle_WRK_DC(dce, Ity_I64, addr, bias+8);
 
@@ -2442,7 +2448,9 @@ void do_shadow_STle_DC ( DCEnv* dce,
    /* Now decide which helper function to call to write the data tag
       into shadow memory. */
    switch (ty) {
+      case Ity_V256: // not right, should do 4 times?
       case Ity_V128: /* we'll use the helper twice */
+      case Ity_I128: /* we'll use the helper twice */
       case Ity_I64: helper = &MC_(helperc_STORE_TAG_8);
                     hname = "MC_(helperc_STORE_TAG_8)";
                     break;
@@ -2575,7 +2583,7 @@ static void do_shadow_CAS_single_DC ( DCEnv* dce, IRCAS* cas ) {
 
    /* 3. check definedness of address */
    /* 4. fetch old# from shadow memory; this also checks
-         addressibility of the address */
+         addressability of the address */
 
    voldLo
      = assignNew_DC(dce, elemTy,
@@ -2739,7 +2747,7 @@ static void do_shadow_CAS_double_DC ( DCEnv* dce, IRCAS* cas )
 
    /* 3. check definedness of address */
    /* 4. fetch old# from shadow memory; this also checks
-         addressibility of the address */
+         addressability of the address */
    if (cas->end == Iend_LE) {
       memOffsLo = 0;
       memOffsHi = elemSzB;

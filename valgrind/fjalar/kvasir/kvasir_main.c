@@ -2,7 +2,7 @@
    This file is part of Kvasir, a C/C++ front end for the Daikon
    dynamic invariant detector built upon the Fjalar framework
 
-   Copyright (C) 2007-2022 University of Washington Computer Science & Engineering Department,
+   Copyright (C) 2007-2026 University of Washington Computer Science & Engineering Department,
    Programming Languages and Software Engineering Group
 
    Copyright (C) 2004-2006 Philip Guo (pgbovine@alum.mit.edu),
@@ -747,7 +747,7 @@ Bool fjalar_tool_process_cmd_line_option(const HChar* arg)
   return True;
 }
 
-/* Do initializion-like tasks that we'd like to postpone until near
+/* Do initialization-like tasks that we'd like to postpone until near
    the end of program startup (right before main()). For instance,
    anything that depends on shared libraries having been loaded. */
 static void kvasir_late_init(void) {

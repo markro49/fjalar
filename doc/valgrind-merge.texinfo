@@ -128,7 +128,7 @@ git clone https://github.com/codespecs/fjalar.git
 
 If your operating system is Ubuntu, run
 @example
-sudo apt-get install binutils-dev
+sudo apt -yqq install binutils-dev
 @end example
 
 
@@ -524,9 +524,9 @@ This keeps the files used during the source merge update to a minimum.
 You will need to make sure @command{gdb} is installed on your machine
 to run these tests. Also, they are very sensitive
 to the system software on the host machine.  In most cases, there will be
-some failures. (Currently, only 1 of 699 tests do not pass on a standard UW/CSE
-system running CentOS 7.7.1908.) Rather, it is important to capture the results
-as they should be identical after the source merge.
+some failures. Rather, it is important to capture the results
+as they should be similar after the source merge. They may not be
+identical due to Valgrind improvements or the addition of new test cases.
 
 To run the @command{regtest} verification tests,
 return to the root of your @file{valgrind-new} directory.  Then run
@@ -543,26 +543,69 @@ This will take about 10-15 minutes.  A summary of the @command{regtest}
 results will be at the end of the log file.  We will use these results in
 @ref{Testing Valgrind}.
 
-Here is a copy of the last few lines from the latest run of these tests (09/21/2020)
-on a UW/CSE CentOS based system:
+Here is a copy of the last few lines from the latest run of these tests (01/21/2026)
+running Valgrind 3.23 on a UW/CSE Rocky Linux (9.7) based system:
 
 @example
-== 719 tests, 2 stderr failure, 0 stdout failures, 0 stderrB failures, 0 stdoutB failures, 0 post failures ==
-none/tests/libvex_test                   (stderr)
-none/tests/libvexmultiarch_test          (stderr)
+== 809 tests, 0 stderr failures, 0 stdout failures, 2 stderrB failures, 16 stdoutB failures, 0 post failures ==
+gdbserver_tests/hginfo                   (stdoutB)
+gdbserver_tests/hgtls                    (stdoutB)
+gdbserver_tests/mcblocklistsearch        (stderrB)
+gdbserver_tests/mcbreak                  (stdoutB)
+gdbserver_tests/mcclean_after_fork       (stdoutB)
+gdbserver_tests/mcinfcallWSRU            (stderrB)
+gdbserver_tests/mcleak                   (stdoutB)
+gdbserver_tests/mcmain_pic               (stdoutB)
+gdbserver_tests/mcsignopass              (stdoutB)
+gdbserver_tests/mcsigpass                (stdoutB)
+gdbserver_tests/mcvabits                 (stdoutB)
+gdbserver_tests/mcwatchpoints            (stdoutB)
+gdbserver_tests/mssnapshot               (stdoutB)
+gdbserver_tests/nlcontrolc               (stdoutB)
+gdbserver_tests/nlgone_abrt              (stdoutB)
+gdbserver_tests/nlgone_return            (stdoutB)
+gdbserver_tests/nlpasssigalrm            (stdoutB)
+gdbserver_tests/nlvgdbsigqueue           (stdoutB)
 
 ...checking makefile consistency
-massif/tests/Makefile.am:1: error: deep-D.post.exp-ppc64 is missing in EXTRA_DIST
 ...checking header files and include directives
-*** File fjalar/mc_main.c must not include ../coregrind/pub_core_aspacemgr.h
-make[1]: *** [regtest] Error 1
-make[1]: Leaving directory `/homes/gws/markro/invariants/fjalar/valgrind'
-make: *** [test] Error 2
+Unknown directory 'inst'. Please update check_headers_and_includes
+make: *** [Makefile:1440: regtest] Error 1
 @end example
 
+(Note that the failure of all the gdbserver tests indicates that the system does not
+have the proper glibc-debuginfo installed.)
 (Note the final include file failure - this is expected behavior.)
+(Note that the unknown directory failure is expected behavior.)
 
+Here is a another example from the latest run of these tests (01/21/2026)
+running Valgrind 3.23 on a Ubuntu Linux (25.10) based system:
 
+@example
+== 895 tests, 9 stderr failures, 2 stdout failures, 1 stderrB failure, 2 stdoutB failures, 0 post failures ==
+gdbserver_tests/mcinfcallWSRU            (stderrB)
+gdbserver_tests/nlcontrolc               (stdoutB)
+gdbserver_tests/nlvgdbsigqueue           (stdoutB)
+memcheck/tests/linux/sys-execveat        (stdout)
+memcheck/tests/linux/sys-execveat        (stderr)
+memcheck/tests/sendmsg                   (stderr)
+memcheck/tests/x86-linux/scalar          (stderr)
+helgrind/tests/tc22_exit_w_lock          (stderr)
+drd/tests/std_thread2                    (stderr)
+none/tests/fdleak_ipv4                   (stderr)
+none/tests/file_dclose                   (stderr)
+none/tests/scripts/bug231357             (stdout)
+none/tests/scripts/bug231357             (stderr)
+none/tests/socket_close                  (stderr)
+
+...checking makefile consistency
+...checking header files and include directives
+Unknown directory 'inst'. Please update check_headers_and_includes
+make: *** [Makefile:1445: regtest] Error 1
+@end example
+
+As you can see, the results vary depending on the host system.  The important thing to verify
+is that the results are the same before and after any Binutils changes.
 
 @node Updating Readelf from Binutils
 @chapter Updating Readelf from Binutils
