@@ -295,9 +295,9 @@ const char* DeclaredTypeNames[] = {"D_NO_TYPE", // Create padding
 // Not allowing template class member names (?)
 // was causing failures.  I removed the check
 // for "_M_" and all seems to be okay.
-static char ignore_function_with_name(char* name) {
+static char ignore_function_with_name(char* name, Bool quiet) {
 
-  FJALAR_DPRINTF("  *ppt_name: %s\n", name);
+  FJALAR_DPRINTF_IF(!quiet, "  *ppt_name: %s\n", name);
 
   if (!name) {
     return 0;
@@ -316,7 +316,7 @@ static char ignore_function_with_name(char* name) {
       (0 == VG_(strncmp)(name, "min<size_t>", 11)) ||
       // g++-3.4 seems to show this:
       (0 == VG_(strncmp)(name, "__verify_grouping", 17))) {
-    // FJALAR_DPRINTF("ignoring function named: %s\n", name);
+    // FJALAR_DPRINTF_IF(!quiet, "ignoring function named: %s\n", name);
     return 1;
   }
   else {
@@ -1003,14 +1003,14 @@ int entry_is_valid_function(dwarf_entry *entry, Bool quiet) {
     // if (funcPtr->name != 0) {
     //    printf("[entry_is_valid_function] start_pc: %p, is_decl: %d, is_inline: %d, ignore_name: %d\n",
     //      (void *)funcPtr->start_pc,
-    //      funcPtr->is_declaration, funcPtr->is_inline, ignore_function_with_name(funcPtr->name));
+    //      funcPtr->is_declaration, funcPtr->is_inline, ignore_function_with_name(funcPtr->name, quiet);
     // }
 
     if (funcPtr->name != 0 &&
         funcPtr->start_pc &&
         (!funcPtr->is_declaration) &&
         (!funcPtr->is_inline) &&
-        (!ignore_function_with_name(funcPtr->name))) {
+        (!ignore_function_with_name(funcPtr->name, quiet))) {
       return 1;
     } else {
 

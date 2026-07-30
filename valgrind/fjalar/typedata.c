@@ -2066,8 +2066,6 @@ static void process_specification_items(void)
                 cur_var->name = demangled_name;
                 // Since we process both the variable and the aliased member,
                 // better copy revised name back to member var.  (markro)
-                // FJALAR_DPRINTF("  spec name: %s, link name: %s\n",
-                //                ((member*)(aliased_entry->entry_ptr))->name, demangled_name);
                 ((member*)(aliased_entry->entry_ptr))->name = demangled_name; 
             } else {
                 cur_var->name = ((member*)(aliased_entry->entry_ptr))->name;
