@@ -226,7 +226,7 @@ returnArrayVariableWithAddr(VarList* varList,
         potentialVarBaseAddr = e->lowSP + potentialVar->byteOffset;
       }
     }
-    FJALAR_DPRINTF("potential var expression size: %u\n", potentialVar->location_expression_size);
+    // FJALAR_DPRINTF("potential var expression size: %u\n", potentialVar->location_expression_size);
     if (potentialVar->location_expression_size) {
       unsigned int i = 0;
       for(i = 0; i < potentialVar->location_expression_size; i++ ) {

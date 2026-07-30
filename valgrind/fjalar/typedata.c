@@ -912,6 +912,7 @@ char harvest_name(dwarf_entry* e, const char* str1)
     }
   else if (tag_is_function(tag))
     {
+      // printf("normal name: %s\n", str1);
       if (is_rust_compiler_generated_subprogram(str1)) {
         e->compiler_generated = true;
       }
@@ -2065,8 +2066,8 @@ static void process_specification_items(void)
                 cur_var->name = demangled_name;
                 // Since we process both the variable and the aliased member,
                 // better copy revised name back to member var.  (markro)
-                FJALAR_DPRINTF("  spec name: %s, link name: %s\n",
-                               ((member*)(aliased_entry->entry_ptr))->name, demangled_name);
+                // FJALAR_DPRINTF("  spec name: %s, link name: %s\n",
+                //                ((member*)(aliased_entry->entry_ptr))->name, demangled_name);
                 ((member*)(aliased_entry->entry_ptr))->name = demangled_name; 
             } else {
                 cur_var->name = ((member*)(aliased_entry->entry_ptr))->name;

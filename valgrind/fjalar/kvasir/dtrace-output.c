@@ -43,6 +43,8 @@
 
 #define DTRACE_PRINTF(...) do { if (!dyncomp_without_dtrace) \
        fprintf(dtrace_fp, __VA_ARGS__); } while (0)
+    // DEBUG: replace line above with line below to copy dtrace output to stdout.
+    // {fprintf(dtrace_fp, __VA_ARGS__); printf("DTRACE: ");printf(__VA_ARGS__);}} while (0)
 
 // Global variable storing the current variable name.
 // currently used for debugging comparability values
@@ -169,6 +171,9 @@ static void printOneDtraceString(char* str1)
       case '\\':
 	DTRACE_PRINTF( "\\\\");
 	break;
+//      case '\xff':  // special case EOF
+//	DTRACE_PRINTF( "\x04");  // change to EOT
+//	break;
       default:
 	DTRACE_PRINTF( "%c", *str1);
       }
@@ -778,6 +783,7 @@ char printDtraceSingleBaseValue(Addr pValue,
       // This is where the actual printing of the variable is done. This
       // was a bit hard to figure out.
       // UNDONE: special case Rust 128 bit types
+      // printf("\tdecType is: %u, %s\n", decType, DeclaredTypeStringX[decType]);
       TYPES_SWITCH(DTRACE_PRINT_ONE_VAR)
 
       if (kvasir_with_dyncomp) {

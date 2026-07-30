@@ -3760,6 +3760,7 @@ read_and_display_attr_value (unsigned long           attribute,
     case DW_AT_lower_bound:
     case DW_AT_count:
     case DW_AT_rank:
+    printf("block_start: %p\n", block_start);
       if (block_start)
 	{
 	  int need_frame_base;
