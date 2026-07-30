@@ -300,6 +300,10 @@ typedef struct
                                                      Is likely to be a register expression
                                                      or the location list */
   long frame_base_offset; /* Offset from Frame_base_expression that corresponds to the frame_base */
+  // An entry with is_inline set describes an instance of a function
+  // that the compiler has inlined.  The concrete out-of-line instance,
+  // if the compiler emitted one, will be a separate entry that has its
+  // own start_pc and DW_AT_inline is not set.
   char is_inline;  /* Has it been inlined? If so, probably want to skip it */
 
 } function;
