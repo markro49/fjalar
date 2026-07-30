@@ -1893,9 +1893,13 @@ static void process_abstract_origin_items(void)
           VG_(memcpy)(aliased_formal_param->dwarf_stack, cur_param->dwarf_stack,
                       sizeof(dwarf_location)*cur_param->dwarf_stack_size);
 
-          cur_param->name = aliased_formal_param->name;
-          cur_param->type_ID = aliased_formal_param->type_ID;
-          //cur_param->type_ptr = aliased_formal_param->type_ptr;
+          if(!cur_param->name) {
+            cur_param->name = aliased_formal_param->name;
+          }
+          if(!cur_param->type_ID) {
+            cur_param->type_ID = aliased_formal_param->type_ID;
+            cur_param->type_ptr = aliased_formal_param->type_ptr;
+          }
         }
       }
     } else if(tag_is_variable(cur_entry->tag_name)) {
@@ -1915,9 +1919,13 @@ static void process_abstract_origin_items(void)
           tl_assert(tag_is_variable(aliased_entry->tag_name));
           aliased_variable = (variable*) (aliased_entry->entry_ptr);
 
-          cur_var->name = aliased_variable->name;
-          cur_var->type_ID = aliased_variable->type_ID;
-          cur_var->type_ptr = aliased_variable->type_ptr;
+          if(!cur_var->name) {
+            cur_var->name = aliased_variable->name;
+          }
+          if(!cur_var->type_ID) {
+            cur_var->type_ID = aliased_variable->type_ID;
+            cur_var->type_ptr = aliased_variable->type_ptr;
+          }
         }
       }
     }

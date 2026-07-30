@@ -791,9 +791,9 @@ void repCheckAllEntries(void) {
           tl_assert(IS_MEMBER_VAR(curMember));
           tl_assert(0 == curMember->byteOffset);
 
-          // For a struct, check that data_member_location is greater
-          // than or equal to that of the previous member variable.
-          // Don't do this check for bitfields.
+          // This code used to assert that struct members appear at monotonically
+          // increasing offsets. That is not true for Rust, which reorders
+          // fields, and the DWARF specification never required it. (markro 4/9/26)
           if (D_STRUCT_CLASS == t->decType) {
             // We don't check bit-fields as the compiler may
             // allocate them to a previous location.
@@ -802,9 +802,6 @@ void repCheckAllEntries(void) {
                  curMember->memberVar->internalByteSize,
                  curMember->memberVar->internalBitOffset,
                  curMember->memberVar->internalBitSize);
-            // This code used to assert that members appear at monotonically
-            // increasing offsets.  That is not true for Rust, which reorders
-            // fields, and the DWARF specification never required it. (markro 4/9/26)
           }
           // For a union, all offsets should be 0
           else if (D_UNION == t->decType) {
