@@ -218,7 +218,9 @@ const char* DeclaredTypeString[] = {
   "char",                   // D_CHAR_AS_STRING
   "char32_t",               // D_CHAR32  // should be just char for Rust
   "bool",                   // D_BOOL
-  "<ZST>"                   // D_ZST // UNDONE: not sure what to output for a ZST
+  // A ZST never appears in a tool's output (see varHasReportableValue), so
+  // this string is only ever seen in debugging output.
+  "<ZST>"                   // D_ZST
 };
 
 // To figure out if a certain DeclaredType t is a basic type, simply
