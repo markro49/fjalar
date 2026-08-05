@@ -91,6 +91,8 @@ static const char* TYPE_FORMAT_STRINGS[] = {
   "%d - ERROR - D_FUNCTION",       // D_FUNCTION // currently unused
   "%d - ERROR - D_VOID",           // D_VOID     // currently unused
   "%d - ERROR - D_CHAR_AS_STRING", // D_CHAR_AS_STRING
+  "U%02X",                         // D_CHAR8    // print as 2 hex digits
+  "U%04X",                         // D_CHAR16   // print as 4 hex digits
   "U%04X",                         // D_CHAR32   // print as 4 hex digits
   "%d" ,                           // D_BOOL
   "ZST",                           // D_ZST      // Zero Sized Types are Rust only
@@ -295,12 +297,14 @@ switch (decType) \
 { \
  case D_BOOL: \
  case D_UNSIGNED_CHAR: \
+ case D_CHAR8: \
    OPERATION(unsigned char) \
    break; \
  case D_CHAR: \
    OPERATION(char) \
    break; \
  case D_UNSIGNED_SHORT: \
+ case D_CHAR16: \
    OPERATION(unsigned short) \
    break; \
  case D_SHORT: \
@@ -739,6 +743,8 @@ const char* DeclaredTypeStringX[] = {
   "function",               // D_FUNCTION
   "void",                   // D_VOID
   "char",                   // D_CHAR_AS_STRING
+  "char8_t",                // D_CHAR8
+  "char16_t",               // D_CHAR16
   "char32_t",               // D_CHAR32  // should be just char for Rust
   "bool",                   // D_BOOL
   "<ZST>"                   // D_ZST // UNDONE: not sure what to output for a ZST

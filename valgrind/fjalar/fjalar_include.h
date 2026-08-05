@@ -68,6 +68,8 @@ typedef enum _DeclaredType {
   D_FUNCTION,
   D_VOID,
   D_CHAR_AS_STRING,   // when .disambig 'C' option is used with chars
+  D_CHAR8,            // Unicode: char8_t for C and C++
+  D_CHAR16,           // Unicode: char16_t for C and C++
   D_CHAR32,           // Unicode: char32_t for C and char for Rust
   D_BOOL,             // C++ only
   D_ZST               // Zero Sized Types are Rust only
