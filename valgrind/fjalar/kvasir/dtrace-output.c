@@ -100,6 +100,9 @@ static const char* TYPE_FORMAT_STRINGS[] = {
 // declared in generate_fjalar_entries.h:
 extern const int DecTypeByteSizes[];
 
+// This array can be indexed using the DeclaredType enum.
+extern const char* DeclaredTypeString[];
+
 // If there are function names (e.g., C++ demangled names) that are
 // illegal for Daikon, we can patch them up here before writing them
 // to the .dtrace file:
