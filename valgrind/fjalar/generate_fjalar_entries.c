@@ -178,11 +178,12 @@ TypeEntry* BasicTypesArray[] = {
   &LongDoubleType,          //  D_LONG_DOUBLE,
 
   0,                        //  D_ENUMERATION,
+
   0,                        //  D_STRUCT_CLASS,
   0,                        //  D_UNION,
-
   &FunctionType,            //  D_FUNCTION,
   &VoidType,                //  D_VOID,
+
   0,                        //  D_CHAR_AS_STRING
   &Char8Type,               //  D_CHAR8,
   &Char16Type,              //  D_CHAR16,
@@ -216,11 +217,12 @@ const char* DeclaredTypeString[] = {
   // This should NOT be used unless you created an unnamed struct/union!
   // Use TypeEntry::typeName instead
   "enumeration",            // D_ENUMERATION
+
   "struct",                 // D_STRUCT_CLASS
   "union",                  // D_UNION
-
   "function",               // D_FUNCTION
   "void",                   // D_VOID
+
   "char",                   // D_CHAR_AS_STRING
   "char8_t",                // D_CHAR8
   "char16_t",               // D_CHAR16
@@ -276,11 +278,8 @@ const char* DeclaredTypeNames[] = {"D_NO_TYPE", // Create padding
                              "D_LONG_LONG_INT",           // not used if 64 bit
                              "D_U128",                    // Rust
                              "D_I128",                    // Rust
-                             "D_UNSIGNED_FLOAT", // currently unused
                              "D_FLOAT",
-                             "D_UNSIGNED_DOUBLE", // currently unused
                              "D_DOUBLE",
-                             "D_UNSIGNED_LONG_DOUBLE", // currently unused
                              "D_LONG_DOUBLE",
                              "D_ENUMERATION",
                              "D_STRUCT_CLASS",

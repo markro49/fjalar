@@ -85,11 +85,12 @@ static const char* TYPE_FORMAT_STRINGS[] = {
   "%.17g",                         // D_LONG_DOUBLE,
 
   "%d",                            // D_ENUMERATION,
+
   "%d - ERROR - D_STRUCT",         // D_STRUCT,  // currently unused
   "%d - ERROR - D_UNION",          // D_UNION,   // currently unused
-
   "%d - ERROR - D_FUNCTION",       // D_FUNCTION // currently unused
   "%d - ERROR - D_VOID",           // D_VOID     // currently unused
+
   "%d - ERROR - D_CHAR_AS_STRING", // D_CHAR_AS_STRING
   "U%02X",                         // D_CHAR8    // print as 2 hex digits
   "U%04X",                         // D_CHAR16   // print as 4 hex digits
