@@ -77,8 +77,8 @@ static const char* TYPE_FORMAT_STRINGS[] = {
   "%llu",                          // D_UNSIGNED_LONG_LONG_INT,
   "%lld",                          // D_LONG_LONG_INT,
 
-  "%llu",                          // D_U128,  // Rust, but C has no corresponding format
-  "%lld",                          // D_I128,  // Rust, but C has no corresponding format
+  "%d - ERROR - D_U128",           // D_U128,  // Rust; unused, no C type is this wide
+  "%d - ERROR - D_I128",           // D_I128,  // Rust; unused, no C type is this wide
 
   "%.9g",                          // D_FLOAT,
   "%.17g",                         // D_DOUBLE,
@@ -93,7 +93,8 @@ static const char* TYPE_FORMAT_STRINGS[] = {
   "%d - ERROR - D_CHAR_AS_STRING", // D_CHAR_AS_STRING
   "U%02X",                         // D_CHAR8    // print as 2 hex digits
   "U%04X",                         // D_CHAR16   // print as 4 hex digits
-  "U%04X",                         // D_CHAR32   // print as 4 hex digits
+  "%u",                            // D_CHAR32   // print the code point as an integer,
+                                   //            // to match its rep type of R_INT
   "%d" ,                           // D_BOOL
   "ZST",                           // D_ZST      // Zero Sized Types are Rust only
 };
@@ -101,6 +102,9 @@ static const char* TYPE_FORMAT_STRINGS[] = {
 // The indices to this array must match the DeclaredType enum
 // declared in generate_fjalar_entries.h:
 extern const int DecTypeByteSizes[];
+
+// This array can be indexed using the DeclaredType enum.
+extern const char* DeclaredTypeString[];
 
 // If there are function names (e.g., C++ demangled names) that are
 // illegal for Daikon, we can patch them up here before writing them
@@ -332,10 +336,11 @@ switch (decType) \
    OPERATION(long long int) \
    break; \
  case D_U128: \
-   OPERATION(unsigned long long int) \
-   break; \
  case D_I128: \
-   OPERATION(long long int) \
+   /* No C type is 128 bits wide. We have not yet implmented these.  */ \
+   /* varHasReportableValue() suppresses such variables, so a value of */ \
+   /* one of these types never reaches here.                           */ \
+   tl_assert(0 && "TYPES_SWITCH() - 128-bit type"); \
    break; \
  case D_FLOAT: \
    OPERATION(float) \
@@ -712,44 +717,6 @@ static char printDtraceSequence(VariableEntry* var,
   return 1;
 }
 
-// This array can be indexed using the DeclaredType enum
-const char* DeclaredTypeStringX[] = {
-  "no_declared_type",       // D_NO_TYPE, // Create padding
-
-  "unsigned char",          // D_UNSIGNED_CHAR,
-  "char",                   // D_CHAR,
-  "unsigned short",         // D_UNSIGNED_SHORT,
-  "short",                  // D_SHORT,
-  "unsigned int",           // D_UNSIGNED_INT,
-  "int",                    // D_INT,
-  "unsigned long",          // D_UNSIGNED_LONG,
-  "long",                   // D_LONG,
-  "unsigned long long int", // D_UNSIGNED_LONG_LONG_INT,
-  "long long int",          // D_LONG_LONG_INT,
-
-  "u128",                   // D_U128,  // Rust
-  "i128",                   // D_I128,  // Rust
-
-  "float",                  // D_FLOAT,
-  "double",                 // D_DOUBLE,
-  "long double",            // D_LONG_DOUBLE,
-
-  // This should NOT be used unless you created an unnamed struct/union!
-  // Use TypeEntry::typeName instead
-  "enumeration",            // D_ENUMERATION
-  "struct",                 // D_STRUCT_CLASS
-  "union",                  // D_UNION
-
-  "function",               // D_FUNCTION
-  "void",                   // D_VOID
-  "char",                   // D_CHAR_AS_STRING
-  "char8_t",                // D_CHAR8
-  "char16_t",               // D_CHAR16
-  "char32_t",               // D_CHAR32  // should be just char for Rust
-  "bool",                   // D_BOOL
-  "<ZST>"                   // D_ZST // UNDONE: not sure what to output for a ZST
-};
-
 // Print a single numerical value to .dtrace pointed-to by pValue
 static
 char printDtraceSingleBaseValue(Addr pValue,
@@ -789,7 +756,7 @@ char printDtraceSingleBaseValue(Addr pValue,
       // This is where the actual printing of the variable is done. This
       // was a bit hard to figure out.
       // UNDONE: special case Rust 128 bit types
-      // printf("\tdecType is: %u, %s\n", decType, DeclaredTypeStringX[decType]);
+      // printf("\tdecType is: %u, %s\n", decType, DeclaredTypeString[decType]);
       TYPES_SWITCH(DTRACE_PRINT_ONE_VAR)
 
       if (kvasir_with_dyncomp) {
