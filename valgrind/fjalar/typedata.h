@@ -352,7 +352,7 @@ typedef struct
 
 } formal_parameter;
 
-// The DWARF DW_TAG_templake_type_parameter is used to describe the type
+// The DWARF DW_TAG_template_type_parameter is used to describe the type
 // parameter (or parameters) used in a generic function or structure
 // definition. DWARF does not represent the generic template definition,
 // but does represent each instantiation.
@@ -607,4 +607,5 @@ unsigned long findFunctionStartPCForVariableEntry(dwarf_entry* e);
 namespace_type* findNamespaceForVariableEntry(dwarf_entry* e);
 dwarf_entry* find_struct_entry_with_name(char* name);
 char* fjalar_demangle(dwarf_entry* cur_entry, const char* mangled_name);
+void fjalar_demangle_free(char* demangled_name);
 #endif
