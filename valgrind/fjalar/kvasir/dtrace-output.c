@@ -85,16 +85,19 @@ static const char* TYPE_FORMAT_STRINGS[] = {
   "%.17g",                         // D_LONG_DOUBLE,
 
   "%d",                            // D_ENUMERATION,
+
   "%d - ERROR - D_STRUCT",         // D_STRUCT,  // currently unused
   "%d - ERROR - D_UNION",          // D_UNION,   // currently unused
-
   "%d - ERROR - D_FUNCTION",       // D_FUNCTION // currently unused
   "%d - ERROR - D_VOID",           // D_VOID     // currently unused
+
   "%d - ERROR - D_CHAR_AS_STRING", // D_CHAR_AS_STRING
+  "U%02X",                         // D_CHAR8    // print as 2 hex digits
+  "U%04X",                         // D_CHAR16   // print as 4 hex digits
   "%u",                            // D_CHAR32   // print the code point as an integer,
                                    //            // to match its rep type of R_INT
   "%d" ,                           // D_BOOL
-  "ZST",                           // D_ZST      // Zero Sized Types are Rust only
+  "%d - ERROR - D_ZST",            // D_ZST      // Zero Sized Types are Rust only; never printed
 };
 
 // The indices to this array must match the DeclaredType enum
@@ -299,12 +302,14 @@ switch (decType) \
 { \
  case D_BOOL: \
  case D_UNSIGNED_CHAR: \
+ case D_CHAR8: \
    OPERATION(unsigned char) \
    break; \
  case D_CHAR: \
    OPERATION(char) \
    break; \
  case D_UNSIGNED_SHORT: \
+ case D_CHAR16: \
    OPERATION(unsigned short) \
    break; \
  case D_SHORT: \
@@ -318,7 +323,6 @@ switch (decType) \
  case D_ENUMERATION: \
    OPERATION(int) \
    break; \
- case D_ZST: \
  case D_UNSIGNED_LONG: \
    OPERATION(unsigned long) \
    break; \
@@ -343,6 +347,12 @@ switch (decType) \
    break; \
  case D_DOUBLE: \
    OPERATION(double) \
+   break; \
+ case D_ZST: \
+   /* A ZST has no storage to read: its address is a fabricated dangling */ \
+   /* one.  The traversal never reports a ZST to a tool (see */ \
+   /* varHasReportableValue), so a ZST never reaches this switch. */ \
+   tl_assert(0 && "TYPES_SWITCH() - D_ZST"); \
    break; \
  default: \
    DTRACE_PRINTF( "TYPES_SWITCH() - unknown type"); \

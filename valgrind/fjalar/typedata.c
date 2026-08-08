@@ -1866,8 +1866,11 @@ static void process_abstract_origin_items(void)
               cur_func->return_type_ID = aliased_func_ptr->return_type_ID;
             if (!cur_func->accessibility)
               cur_func->accessibility = aliased_func_ptr->accessibility;
-            if (!cur_func->is_inline)
-              cur_func->is_inline = aliased_func_ptr->is_inline;
+            // Do not copy is_inline: the abstract instance root carries
+            // DW_AT_inline, but cur_func is a concrete instance with its own
+            // start_pc, which is code that is actually called and that we
+            // therefore want to instrument.  Copying is_inline here would make
+            // entry_is_valid_function reject it.
             if (!cur_entry->compiler_generated)
               cur_entry->compiler_generated = aliased_entry->compiler_generated;
           }
@@ -2633,8 +2636,9 @@ static void link_array_entries_to_members(void)
 // target_type_id: type ID we are trying to find
 // param_entry: formal_parameter dwarf_entry of param we are trying to find name for
 //
-// A template parameter is claimed by at most one formal parameter.  Without
-// that, a generic instantiated with the same type more than once (for example,
+// A template parameter is claimed by at most one formal parameter: a matching
+// entry is marked, and already-marked entries are skipped.  Without that, a
+// generic instantiated with the same type more than once (for example,
 // foo<T, U> where both T and U become i32) would give every one of its
 // unnamed formals the same name.
 static bool link_template_type_param_to_formal_param(unsigned long start_index, unsigned long target_type_id, dwarf_entry* param_entry)
@@ -2652,8 +2656,9 @@ static bool link_template_type_param_to_formal_param(unsigned long start_index, 
     if (tag_is_template_type_param(type_entry->tag_name) && type_entry->level == formal_param_level) {
       template_type_parameter* template_type_param_ptr = (template_type_parameter*)(type_entry->entry_ptr);
       // check type match
-      if (template_type_param_ptr->type_ID == target_type_id) {
+      if (!template_type_param_ptr->claimed && (template_type_param_ptr->type_ID == target_type_id)) {
         // copy name
+        template_type_param_ptr->claimed = true;
         formal_param_ptr->name = VG_(strdup)("typedata.c: link_template_type_param_to_formal_param", template_type_param_ptr->name);
         FJALAR_DPRINTF("  copy name: %s\n", formal_param_ptr->name);
         return true;
@@ -2714,29 +2719,27 @@ static void link_template_type_params_to_formal_params(void)
           // first get the type of the formal parameter
           unsigned long target_type_id = formal_param_ptr->type_ID;
           dwarf_entry* formal_type_ptr = formal_param_ptr->type_ptr;
-          bool keep_looking = true;
           bool found = false;
-          do {
+          while (true) {
             if (link_template_type_param_to_formal_param(param_index + 1, target_type_id, param_entry)) {
               // we found the name
               // look for more formal parameters
               param_index++;
               found = true;
+              break;
             }
 
-            if (!found && formal_type_ptr->tag_name == DW_TAG_pointer_type) {
-              modifier_type* mod_ptr = (modifier_type*)(formal_type_ptr->entry_ptr);
-              target_type_id = mod_ptr->target_ID;
-              formal_type_ptr = mod_ptr->target_ptr;
-              // This seems like a compiler error, but some older gcc versions
-              // seem to generate a pointer with no type.
-              if (formal_type_ptr == 0) {
-                keep_looking = false;
-              }
-            } else {
-              keep_looking = false;
+            // Not found; if the formal parameter is a pointer, try again with
+            // the type it points to.  formal_type_ptr is null if the type did
+            // not resolve, which happens for a pointer with no type; that seems
+            // like a compiler error, but some older gcc versions generate one.
+            if ((formal_type_ptr == 0) || (formal_type_ptr->tag_name != DW_TAG_pointer_type)) {
+              break;
             }
-          } while (keep_looking);
+            modifier_type* mod_ptr = (modifier_type*)(formal_type_ptr->entry_ptr);
+            target_type_id = mod_ptr->target_ID;
+            formal_type_ptr = mod_ptr->target_ptr;
+          }
           if (!found) {
             // A Rust developer told me that if a formal parameter is not used
             // it might not be given a name in the dwarf output.  Leave the name
