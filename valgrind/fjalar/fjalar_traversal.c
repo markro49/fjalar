@@ -1401,10 +1401,17 @@ static char interestedInVar(const HChar* fullFjalarName, char* trace_vars_tree) 
 // exist: both passes walk variables through this same code, and
 // g_variableIndex advances identically whether or not we report.
 //
-// This tests for the two ways a type can be declared with no bytes rather
-// than for a zero byteSize alone, so that a type Fjalar merely failed to
-// size does not get silently dropped.  Note that an opaque C type (declared
-// but never defined) is not one of these: Fjalar resolves it to void*.
+// Both tests are on the declared type rather than on a zero byteSize, so
+// that a type Fjalar merely failed to size does not get silently dropped.
+// Note that an opaque C type (declared but never defined) is not one of
+// these: Fjalar resolves it to void*.
+//
+// A struct or union whose byteSize is 0 (a Rust unit struct or PhantomData,
+// or the GNU C zero-size struct extension) is deliberately not suppressed.
+// A zero byteSize does not identify such a type: extractStructUnionType
+// records byteSize 0 for every struct or union that has no member variables,
+// such as a C++ class that declares only methods, so suppressing on that
+// test would drop variables whose values are worth reporting.
 static char varHasReportableValue(VariableEntry* var) {
   TypeEntry* t = var->varType;
 
@@ -1422,24 +1429,6 @@ static char varHasReportableValue(VariableEntry* var) {
     return 0;
   }
 
-  // UNDONE: This does not work as envisaged. There are many entities that
-  // have byteSize == 0 that we do not want to skip. Perhaps it is a bug
-  // that they have size 0 to begin with. Needs more investigation.
-  // Also, determineVariableByteSize(var) should be used instead of t->byteSize.
-
-  // A struct/union/class declared with no bytes: Rust unit structs and
-  // PhantomData, and the GNU C zero-size struct extension.
-  if ((0 == t->byteSize) &&
-      ((D_STRUCT_CLASS == t->decType) || (D_UNION == t->decType))) {
-    // temporary debugging code
-    // printf("varHasReportableValue:\n  var: %s\n", var->name);
-    // printf("  type: %s\n", DeclaredTypeString[t->decType]);
-    // printf("  byteSize: %d\n", t->byteSize);
-    // printf("  prtLevels: %u\n", var->ptrLevels);
-    // printf("  referenceLevels: %u\n", var->referenceLevels);
-    // printf("  isConstant: %u\n", var->isConstant);
-    // return 0;
-  }
   return 1;
 }
 
